@@ -1,0 +1,20 @@
+[
+  {
+    "name": "Назуна",
+    "surname": "Нанакуса",
+    "photo": "img/members/nazuna.webp",
+    "specialties": ["вампир"]
+  },
+  {
+    "name": "Ко",
+    "surname": "Ямори",
+    "photo": "img/members/kou.jpg",
+    "specialties": ["школьник"]
+  },
+  {
+    "name": "Анко",
+    "surname": "Угису",
+    "photo": "img/members/anko.jpg",
+    "specialties": ["детектив"]
+  }
+]

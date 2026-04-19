@@ -1,0 +1,21 @@
+{% extends 'index.html' %}
+
+{% block content %}
+    <h2>Список профессий</h2>
+    
+    {% if list_tag == 'ul' %}
+        <ul>
+            {% for prof in profs %}
+                <li>{{ prof }}</li>
+            {% endfor %}
+        </ul>
+    {% elif list_tag == 'ol' %}
+        <ol>
+            {% for prof in profs %}
+                <li>{{ prof }}</li>
+            {% endfor %}
+        </ol>
+    {% else %}
+        <p>Неверный параметр. Используйте 'ol' или 'ul'</p>
+    {% endif %}
+{% endblock %}

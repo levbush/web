@@ -1,0 +1,18 @@
+{% extends 'index.html' %}
+
+{% block content %}
+    
+    {% if 'инженер' in profession.lower() or 'строитель' in profession.lower() %}
+        <h2>Инженерные тренажеры</h2>
+        <div class='scheme'>
+            <img src='{{ url_for('static', filename='img/engineer_scheme.jpg') }}' 
+                 alt='Схема инженерных тренажеров'>
+        </div>
+    {% else %}
+        <h2>Научные симуляторы</h2>
+        <div class='scheme'>
+            <img src='{{ url_for('static', filename='img/science_scheme.jpg') }}' 
+                 alt='Схема научных симуляторов'>
+        </div>
+    {% endif %}
+{% endblock %}

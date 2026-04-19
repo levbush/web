@@ -1,0 +1,20 @@
+{% extends "index.html" %}
+
+{% block title %}Член экипажа{% endblock %}
+
+{% block content %}
+<center>
+<h2>
+    {{ member.name }} {{ member.surname }}
+</h2>
+
+<div>
+    <img src="{{ url_for('static', filename=member.photo) }}"
+         style="max-height: 300px;">
+</div>
+
+<p>
+    {{ member.specialties | sort | join(', ') }}
+</p>
+</center>
+{% endblock %}

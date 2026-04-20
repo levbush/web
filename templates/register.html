@@ -1,0 +1,52 @@
+{% extends "index.html" %}
+
+{% block content %}
+
+<h2>Register Form</h2>
+
+<form method="post">
+    <p>
+        <label>Login / email<br>
+        <input type="email" name="email" value="{{ email or '' }}"></label>
+    </p>
+    <p>
+        <label>Password<br>
+        <input type="password" name="password"></label>
+    </p>
+    <p>
+        <label>Repeat password<br>
+        <input type="password" name="password_again"></label>
+    </p>
+    <p>
+        <label>Surname<br>
+        <input type="text" name="surname" value="{{ surname or '' }}"></label>
+    </p>
+    <p>
+        <label>Name<br>
+        <input type="text" name="name" value="{{ name or '' }}"></label>
+    </p>
+    <p>
+        <label>Age<br>
+        <input type="number" name="age" value="{{ age or '' }}"></label>
+    </p>
+    <p>
+        <label>Position<br>
+        <input type="text" name="position" value="{{ position or '' }}"></label>
+    </p>
+    <p>
+        <label>Speciality<br>
+        <input type="text" name="speciality" value="{{ speciality or '' }}"></label>
+    </p>
+    <p>
+        <label>Address<br>
+        <input type="text" name="address" value="{{ address or '' }}"></label>
+    </p>
+
+    {% if message %}
+        <p style="color: red;">{{ message }}</p>
+    {% endif %}
+
+    <button type="submit">Submit</button>
+</form>
+
+{% endblock %}

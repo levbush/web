@@ -1,8 +1,9 @@
-from flask import Flask, render_template
+from flask import Flask, render_template, request, redirect
+from werkzeug.security import generate_password_hash, check_password_hash
 import random
 import json
 import os
-from data import db_session
+from data.db_session import global_init, create_session
 from data.job import Jobs
 from data.user import User
 
@@ -82,13 +83,47 @@ def member():
 
 @app.route('/')
 def works_log():
-    with db_session.create_session() as s:
+    with create_session() as s:
         jobs = s.query(Jobs).all()
         return render_template('works_log.html', title='Works Log', jobs=jobs)
 
 
+@app.route('/register', methods=['GET', 'POST'])
+def register():
+    message = None
+    data = {}
+
+    if request.method == 'POST':
+        data = request.form.to_dict()
+        password = data.pop('password', '')
+        password_again = data.pop('password_again', '')
+
+        if password != password_again:
+            message = 'Passwords do not match'
+        else:
+            with create_session() as s:
+                if s.query(User).filter(User.email == data['email']).first():
+                    message = 'User with this email already exists'
+                else:
+                    user = User(
+                        email=data['email'],
+                        surname=data['surname'],
+                        name=data['name'],
+                        age=data['age'] or None,
+                        position=data['position'],
+                        speciality=data['speciality'],
+                        address=data['address'],
+                        hashed_password=generate_password_hash(password),
+                    )
+                    s.add(user)
+                    s.commit()
+            return redirect('/')
+
+    return render_template('register.html', title='Регистрация', message=message, **data)
+
+
 def main():
-    db_session.global_init('db.db')
+    global_init('db.db')
     app.run(port=8080, host='127.0.0.1')
 
 

@@ -1,0 +1,35 @@
+{% extends 'index.html' %}
+
+{% block content %}
+
+<h2>Adding a job</h2>
+
+{% if message %}
+    <p style="color: red;">{{ message }}</p>
+{% endif %}
+
+<form method="post">
+    <p>
+        <label>Job title<br>
+        <input type="text" name="job" value="{{ job or '' }}"></label>
+    </p>
+    <p>
+        <label>Team leader id<br>
+        <input type="number" name="team_leader" value="{{ team_leader or '' }}"></label>
+    </p>
+    <p>
+        <label>Work size (hours)<br>
+        <input type="number" name="work_size" value="{{ work_size or '' }}"></label>
+    </p>
+    <p>
+        <label>Collaborators (ids separated by comma)<br>
+        <input type="text" name="collaborators" value="{{ collaborators or '' }}"></label>
+    </p>
+    <p>
+        <label>
+        <input type="checkbox" name="is_finished" {% if is_finished %}checked{% endif %}> Is finished</label>
+    </p>
+    <button type="submit">Submit</button>
+</form>
+
+{% endblock %}

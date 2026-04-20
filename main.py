@@ -1,4 +1,5 @@
 from flask import Flask, render_template, request, redirect
+from flask_login import LoginManager, login_user, logout_user, login_required, current_user
 from werkzeug.security import generate_password_hash, check_password_hash
 import random
 import json
@@ -9,6 +10,17 @@ from data.user import User
 
 
 app = Flask(__name__)
+app.config['SECRET_KEY'] = 'mars-one-secret-key'
+
+login_manager = LoginManager()
+login_manager.init_app(app)
+login_manager.login_view = 'login'
+
+
+@login_manager.user_loader
+def load_user(user_id):
+    with create_session() as s:
+        return s.get(User, int(user_id))
 
 
 @app.route('/index/<title>')
@@ -49,9 +61,32 @@ def auto_answer():
     return render_template('auto_answer.html', **context)
 
 
-@app.route('/login', methods=['POST', 'GET'])
+@app.route('/login', methods=['GET', 'POST'])
 def login():
-    return render_template('login.html')
+    message = None
+
+    if request.method == 'POST':
+        email = request.form.get('email')
+        password = request.form.get('password')
+        remember_me = bool(request.form.get('remember_me'))
+
+        with create_session() as s:
+            user = s.query(User).filter(User.email == email).first()
+
+        if user and check_password_hash(user.hashed_password, password):
+            login_user(user, remember=remember_me)
+            return redirect('/')
+        else:
+            message = 'Invalid email or password'
+
+    return render_template('login.html', title='Вход', message=message)
+
+
+@app.route('/logout')
+@login_required
+def logout():
+    logout_user()
+    return redirect('/login')
 
 
 @app.route('/distribution')
@@ -120,6 +155,29 @@ def register():
             return redirect('/')
 
     return render_template('register.html', title='Регистрация', message=message, **data)
+
+
+@app.route('/add_job', methods=['GET', 'POST'])
+@login_required
+def add_job():
+    message = None
+    data = {}
+
+    if request.method == 'POST':
+        data = request.form.to_dict()
+        with create_session() as s:
+            job = Jobs(
+                job=data['job'],
+                team_leader=data['team_leader'] or current_user.id,
+                work_size=data['work_size'] or 0,
+                collaborators=data['collaborators'],
+                is_finished=bool(data.get('is_finished')),
+            )
+            s.add(job)
+            s.commit()
+        return redirect('/')
+
+    return render_template('add_job.html', title='Adding a job', message=message, **data)
 
 
 def main():

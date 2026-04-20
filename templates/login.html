@@ -1,24 +1,27 @@
 {% extends 'index.html' %}
 
 {% block content %}
-<form action="#" method="post">
-    <img src="https://yastatic.net/s3/lyceum/content/images/second-year/web/MARS-2-7.png" alt="Эмблема миссии">
-    <fieldset>
-        <legend>Астронавт</legend>
-        <label>Id астронавта:</label>
-        <input type="text" name="astronaut_id" required>
-        <br>
-        <label>Пароль астронавта:</label>
-        <input type="password" name="astronaut_password" required>
-    </fieldset>
-    <fieldset>
-        <legend>Капитан или заместитель</legend>
-        <label>Id капитана:</label>
-        <input type="text" name="captain_id" required>
-        <br>
-        <label>Пароль капитана:</label>
-        <input type="password" name="captain_token" required>
-    </fieldset>
-    <button type="submit">Доступ</button>
+
+<h2>Login Form</h2>
+
+{% if message %}
+    <p style="color: red;">{{ message }}</p>
+{% endif %}
+
+<form method="post">
+    <p>
+        <label>Login / email<br>
+        <input type="email" name="email"></label>
+    </p>
+    <p>
+        <label>Password<br>
+        <input type="password" name="password"></label>
+    </p>
+    <p>
+        <label>
+        <input type="checkbox" name="remember_me"> Remember me</label>
+    </p>
+    <button type="submit">Submit</button>
 </form>
+
 {% endblock %}

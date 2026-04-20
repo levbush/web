@@ -17,9 +17,12 @@ class Jobs(SqlAlchemyBase, SerializerMixin):
     job = C(Str, nullable=True)
     work_size = C(Int, nullable=True, default=0)
     collaborators = C(Str, nullable=True)
-    team_leader = C(Int, sqlalchemy.ForeignKey("users.id"))
     start_date = C(sqlalchemy.DateTime, default=datetime.datetime.now)
     end_date = C(sqlalchemy.DateTime, default=datetime.datetime.now)
     is_finished = C(sqlalchemy.Boolean, default=False)
 
-    user = orm.relationship('User', foreign_keys=[team_leader])
+    team_leader = C(Int, sqlalchemy.ForeignKey("users.id"))
+    user = orm.relationship('User')
+
+    def __repr__(self):
+        return f"<Job> {self.job}"

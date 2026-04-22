@@ -23,6 +23,7 @@ class Jobs(SqlAlchemyBase, SerializerMixin):
 
     team_leader = C(Int, sqlalchemy.ForeignKey("users.id"))
     user = orm.relationship('User')
+    categories = orm.relationship('Category', secondary='jobs_to_categories', backref='jobs')
 
     def __repr__(self):
         return f"<Job> {self.job}"

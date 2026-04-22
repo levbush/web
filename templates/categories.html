@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<h2 style="text-align: center;">Categories</h2>
+
+<div style="margin-bottom: 16px;">
+    <a href="/"><button style="background-color: #555; color: white; padding: 8px 16px; border: none; cursor: pointer;">Back to Jobs</button></a>
+    {% if current_user.is_authenticated %}
+    <a href="/add_category"><button style="background-color: #555; color: white; padding: 8px 16px; border: none; cursor: pointer;">Add a Category</button></a>
+    {% endif %}
+</div>
+
+<table border="1" cellpadding="6" cellspacing="0"
+       style="border-collapse: collapse; width: 100%;">
+    <thead>
+        <tr style="background-color: #d3d3d3;">
+            <th>Id</th>
+            <th>Name</th>
+            {% if current_user.is_authenticated %}
+            <th>Actions</th>
+            {% endif %}
+        </tr>
+    </thead>
+    <tbody>
+        {% for cat in categories %}
+        <tr>
+            <td>{{ cat.id }}</td>
+            <td>{{ cat.name }}</td>
+            {% if current_user.is_authenticated and current_user.id == 1 %}
+            <td>
+                <a href="/edit_category/{{ cat.id }}">
+                    <button style="background-color: #e6a817; color: white; border: none; padding: 4px 10px; cursor: pointer;">Edit</button>
+                </a>
+                <a href="/delete_category/{{ cat.id }}">
+                    <button style="background-color: #c0392b; color: white; border: none; padding: 4px 10px; cursor: pointer;">Delete</button>
+                </a>
+            </td>
+            {% endif %}
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+{% endblock %}

@@ -4,13 +4,13 @@
 
 <h2 style="text-align: center;">Works log</h2>
 
-<a href="/departments"><button style="background-color: #555; color: white; padding: 8px 16px; border: none; cursor: pointer; margin-bottom: 16px;">Departments</button></a>
-
-{% if current_user.is_authenticated %}
-    <a href="/add_job">
-        <button style="background-color: #555; color: white; padding: 8px 16px; border: none; cursor: pointer; margin-bottom: 16px;">Add job</button>
-    </a>
-{% endif %}
+<div style="margin-bottom: 16px;">
+    <a href="/categories"><button style="background-color: #555; color: white; padding: 8px 16px; border: none; cursor: pointer;">Categories</button></a>
+    <a href="/departments"><button style="background-color: #555; color: white; padding: 8px 16px; border: none; cursor: pointer;">Departments</button></a>
+    {% if current_user.is_authenticated %}
+    <a href="/add_job"><button style="background-color: #555; color: white; padding: 8px 16px; border: none; cursor: pointer;">Add job</button></a>
+    {% endif %}
+</div>
 
 {% for job in jobs %}
 <h3>Action # {{ job.id }}</h3>
@@ -23,6 +23,7 @@
             <th>Team leader</th>
             <th>Duration</th>
             <th>List of collaborators</th>
+            <th>Hazard category</th>
             <th>Is finished</th>
         </tr>
     </thead>
@@ -38,6 +39,7 @@
             </td>
             <td>{{ job.work_size }} hours</td>
             <td>{{ job.collaborators }}</td>
+            <td>{{ job.categories | map(attribute='id') | join(', ') }}</td>
             <td>{{ "Finished" if job.is_finished else "Is not finished" }}</td>
         </tr>
     </tbody>

@@ -2,7 +2,7 @@
 
 {% block content %}
 
-<h2>Adding a job</h2>
+<h2>{{ title }}</h2>
 
 {% if message %}
     <p style="color: red;">{{ message }}</p>
@@ -24,6 +24,10 @@
     <p>
         <label>Collaborators (ids separated by comma)<br>
         <input type="text" name="collaborators" value="{{ collaborators or '' }}"></label>
+    </p>
+    <p>
+        <label>Hazard categories (ids separated by comma)<br>
+        <input type="text" name="categories" value="{{ categories or '' }}"></label>
     </p>
     <p>
         <label>

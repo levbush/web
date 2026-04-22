@@ -8,6 +8,7 @@ from data.db_session import global_init, create_session
 from data.job import Jobs
 from data.user import User
 from data.departments import Department
+from data.category import Category
 
 
 app = Flask(__name__)
@@ -180,6 +181,10 @@ def add_job():
                 collaborators=data['collaborators'],
                 is_finished=bool(data.get('is_finished')),
             )
+            for cat_id in [c.strip() for c in data.get('categories', '').split(',') if c.strip()]:
+                cat = s.get(Category, int(cat_id))
+                if cat:
+                    job.categories.append(cat)
             s.add(job)
             s.commit()
         return redirect('/')
@@ -198,6 +203,7 @@ def edit_job(job_id):
             return redirect('/')
 
         if request.method == 'GET':
+            current_cats = ', '.join(str(c.id) for c in job.categories)
             return render_template(
                 'add_job.html',
                 title='Edit job',
@@ -205,6 +211,7 @@ def edit_job(job_id):
                 team_leader=job.team_leader,
                 work_size=job.work_size,
                 collaborators=job.collaborators,
+                categories=current_cats,
                 is_finished=job.is_finished,
             )
 
@@ -213,6 +220,11 @@ def edit_job(job_id):
         job.work_size = request.form['work_size'] or 0
         job.collaborators = request.form['collaborators']
         job.is_finished = bool(request.form.get('is_finished'))
+        job.categories.clear()
+        for cat_id in [c.strip() for c in request.form.get('categories', '').split(',') if c.strip()]:
+            cat = s.get(Category, int(cat_id))
+            if cat:
+                job.categories.append(cat)
         s.commit()
     return redirect('/')
 
@@ -298,6 +310,61 @@ def delete_department(dep_id):
         s.delete(dep)
         s.commit()
     return redirect('/departments')
+
+
+@app.route('/categories')
+def categories():
+    with create_session() as s:
+        cats = s.query(Category).all()
+        return render_template('categories.html', title='Categories', categories=cats)
+
+
+@app.route('/add_category', methods=['GET', 'POST'])
+@login_required
+def add_category():
+    message = None
+    if request.method == 'POST':
+        name = request.form.get('name', '').strip()
+        if not name:
+            message = 'Name is required'
+        else:
+            with create_session() as s:
+                s.add(Category(name=name))
+                s.commit()
+            return redirect('/categories')
+    return render_template('add_category.html', title='Add a Category', message=message)
+
+
+@app.route('/edit_category/<int:cat_id>', methods=['GET', 'POST'])
+@login_required
+def edit_category(cat_id):
+    with create_session() as s:
+        cat = s.get(Category, cat_id)
+        if not cat:
+            return redirect('/categories')
+        if current_user.id != 1:
+            return redirect('/categories')
+
+        if request.method == 'GET':
+            return render_template('add_category.html', title='Edit Category', name=cat.name)
+
+        cat.name = request.form.get('name', '').strip()
+        s.commit()
+    return redirect('/categories')
+
+
+@app.route('/delete_category/<int:cat_id>')
+@login_required
+def delete_category(cat_id):
+    with create_session() as s:
+        cat = s.get(Category, cat_id)
+        if not cat:
+            return redirect('/categories')
+        if current_user.id != 1:
+            return redirect('/categories')
+        s.delete(cat)
+        s.commit()
+    return redirect('/categories')
 
 
 def main():

@@ -7,6 +7,7 @@ import os
 from data.db_session import global_init, create_session
 from data.job import Jobs
 from data.user import User
+from data.departments import Department
 
 
 app = Flask(__name__)
@@ -86,7 +87,7 @@ def login():
         with create_session() as s:
             user = s.query(User).filter(User.email == email).first()
 
-        if user and (not user.hashed_password or check_password_hash(user.hashed_password, password)):
+        if user and check_password_hash(user.hashed_password, password):
             login_user(user, remember=remember_me)
             return redirect('/')
         else:
@@ -228,6 +229,75 @@ def delete_job(job_id):
         s.delete(job)
         s.commit()
     return redirect('/')
+
+
+@app.route('/departments')
+def departments():
+    with create_session() as s:
+        deps = s.query(Department).all()
+        return render_template('departments.html', title='List of Departments', departments=deps)
+
+
+@app.route('/add_department', methods=['GET', 'POST'])
+@login_required
+def add_department():
+    message = None
+    if request.method == 'POST':
+        f = request.form
+        with create_session() as s:
+            if s.query(Department).filter(Department.email == f['email']).first():
+                message = 'Department with this email already exists'
+            else:
+                dep = Department(
+                    title=f['title'], chief=f['chief'] or current_user.id, members=f['members'], email=f['email']
+                )
+                s.add(dep)
+                s.commit()
+                return redirect('/departments')
+    return render_template('add_department.html', title='Add a Department', message=message)
+
+
+@app.route('/edit_department/<int:dep_id>', methods=['GET', 'POST'])
+@login_required
+def edit_department(dep_id):
+    with create_session() as s:
+        dep = s.get(Department, dep_id)
+        if not dep:
+            return redirect('/departments')
+        if current_user.id != dep.chief and current_user.id != 1:
+            return redirect('/departments')
+
+        if request.method == 'GET':
+            return render_template(
+                'add_department.html',
+                title='Edit Department',
+                dep_title=dep.title,
+                chief=dep.chief,
+                members=dep.members,
+                email=dep.email,
+            )
+
+        f = request.form
+        dep.title = f['title']
+        dep.chief = f['chief'] or current_user.id
+        dep.members = f['members']
+        dep.email = f['email']
+        s.commit()
+    return redirect('/departments')
+
+
+@app.route('/delete_department/<int:dep_id>')
+@login_required
+def delete_department(dep_id):
+    with create_session() as s:
+        dep = s.get(Department, dep_id)
+        if not dep:
+            return redirect('/departments')
+        if current_user.id != dep.chief and current_user.id != 1:
+            return redirect('/departments')
+        s.delete(dep)
+        s.commit()
+    return redirect('/departments')
 
 
 def main():

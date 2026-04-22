@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<h2>{{ title }}</h2>
+
+{% if message %}
+    <p style="color: red;">{{ message }}</p>
+{% endif %}
+
+<form method="post">
+    <p>
+        <label>Title of department<br>
+        <input type="text" name="title" value="{{ dep_title or '' }}"></label>
+    </p>
+    <p>
+        <label>Chief (user id)<br>
+        <input type="number" name="chief" value="{{ chief or '' }}"></label>
+    </p>
+    <p>
+        <label>Members (ids separated by comma)<br>
+        <input type="text" name="members" value="{{ members or '' }}"></label>
+    </p>
+    <p>
+        <label>Department email<br>
+        <input type="email" name="email" value="{{ email or '' }}"></label>
+    </p>
+    <button type="submit">Submit</button>
+</form>
+
+{% endblock %}

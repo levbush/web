@@ -4,10 +4,11 @@
 
 <h2 style="text-align: center;">Works log</h2>
 
+<a href="/departments"><button style="background-color: #555; color: white; padding: 8px 16px; border: none; cursor: pointer; margin-bottom: 16px;">Departments</button></a>
+
 {% if current_user.is_authenticated %}
     <a href="/add_job">
-        <button style="background-color: #555; color: white; padding: 8px 16px;
-                       border: none; cursor: pointer; margin-bottom: 16px;">Add job</button>
+        <button style="background-color: #555; color: white; padding: 8px 16px; border: none; cursor: pointer; margin-bottom: 16px;">Add job</button>
     </a>
 {% endif %}
 
@@ -44,12 +45,10 @@
 
 {% if current_user.is_authenticated and (current_user.id == 1 or current_user.id == job.team_leader) %}
     <a href="/edit_job/{{ job.id }}">
-        <button style="background-color: #e6a817; color: white; padding: 8px 16px;
-                       border: none; cursor: pointer; margin-bottom: 16px;">Edit Job</button>
+        <button style="background-color: #e6a817; color: white; padding: 8px 16px; border: none; cursor: pointer; margin-bottom: 16px;">Edit Job</button>
     </a>
     <a href="/delete_job/{{ job.id }}">
-        <button style="background-color: #c0392b; color: white; padding: 8px 16px;
-                       border: none; cursor: pointer; margin-bottom: 16px;">Delete job</button>
+        <button style="background-color: #c0392b; color: white; padding: 8px 16px; border: none; cursor: pointer; margin-bottom: 16px;">Delete job</button>
     </a>
 {% endif %}
 

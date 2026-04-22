@@ -25,7 +25,7 @@ def load_user(user_id):
 
 @app.route('/index/<title>')
 def index(title):
-    return render_template('index.html', title=title)
+    return render_template('base.html', title=title)
 
 
 @app.route('/training/<prof>')
@@ -35,12 +35,25 @@ def training(prof):
 
 @app.route('/list_prof/<list_type>')
 def list_prof(list_type):
-    profs = ['инженер-исследователь', 'пилот', 'строитель', 'экзобиолог', 
-             'врач', 'инженер по терраформированию', 'климатолог', 
-             'специалист по радиационной защите', 'астрогеолог', 'гляциолог', 
-             'инженер жизнеобеспечения', 'метеоролог', 'оператор марсохода', 
-             'киберингенер', 'штурман', 'пилот дронов']
-    
+    profs = [
+        'инженер-исследователь',
+        'пилот',
+        'строитель',
+        'экзобиолог',
+        'врач',
+        'инженер по терраформированию',
+        'климатолог',
+        'специалист по радиационной защите',
+        'астрогеолог',
+        'гляциолог',
+        'инженер жизнеобеспечения',
+        'метеоролог',
+        'оператор марсохода',
+        'киберингенер',
+        'штурман',
+        'пилот дронов',
+    ]
+
     list_tag = list_type if list_type in ['ul', 'ol'] else None
     return render_template('list_prof.html', profs=profs, list_tag=list_tag)
 
@@ -56,7 +69,7 @@ def auto_answer():
         'profession': 'штурман марсохода',
         'sex': 'male',
         'motivation': 'Всегда мечтал застрять на Марсе!',
-        'ready': 'True'
+        'ready': 'True',
     }
     return render_template('auto_answer.html', **context)
 
@@ -73,7 +86,7 @@ def login():
         with create_session() as s:
             user = s.query(User).filter(User.email == email).first()
 
-        if user and check_password_hash(user.hashed_password, password):
+        if user and (not user.hashed_password or check_password_hash(user.hashed_password, password)):
             login_user(user, remember=remember_me)
             return redirect('/')
         else:
@@ -91,14 +104,7 @@ def logout():
 
 @app.route('/distribution')
 def distribution():
-    astronauts_list = [
-        "Ридли Скотт",
-        "Энди Уир",
-        "Марк Уотни",
-        "Венката Капур",
-        "Тедди Сандерс",
-        "Шон Бин"
-    ]    
+    astronauts_list = ["Ридли Скотт", "Энди Уир", "Марк Уотни", "Венката Капур", "Тедди Сандерс", "Шон Бин"]
     return render_template('distribution.html', astronauts_list=astronauts_list)
 
 
@@ -120,7 +126,7 @@ def member():
 def works_log():
     with create_session() as s:
         jobs = s.query(Jobs).all()
-        return render_template('works_log.html', title='Works Log', jobs=jobs)
+        return render_template('index.html', title='Works Log', jobs=jobs)
 
 
 @app.route('/register', methods=['GET', 'POST'])
@@ -178,6 +184,50 @@ def add_job():
         return redirect('/')
 
     return render_template('add_job.html', title='Adding a job', message=message, **data)
+
+
+@app.route('/edit_job/<int:job_id>', methods=['GET', 'POST'])
+@login_required
+def edit_job(job_id):
+    with create_session() as s:
+        job = s.get(Jobs, job_id)
+        if not job:
+            return redirect('/')
+        if current_user.id != job.team_leader and current_user.id != 1:
+            return redirect('/')
+
+        if request.method == 'GET':
+            return render_template(
+                'add_job.html',
+                title='Edit job',
+                job=job.job,
+                team_leader=job.team_leader,
+                work_size=job.work_size,
+                collaborators=job.collaborators,
+                is_finished=job.is_finished,
+            )
+
+        job.job = request.form['job']
+        job.team_leader = request.form['team_leader']
+        job.work_size = request.form['work_size'] or 0
+        job.collaborators = request.form['collaborators']
+        job.is_finished = bool(request.form.get('is_finished'))
+        s.commit()
+    return redirect('/')
+
+
+@app.route('/delete_job/<int:job_id>')
+@login_required
+def delete_job(job_id):
+    with create_session() as s:
+        job = s.get(Jobs, job_id)
+        if not job:
+            return redirect('/')
+        if current_user.id != job.team_leader and current_user.id != 1:
+            return redirect('/')
+        s.delete(job)
+        s.commit()
+    return redirect('/')
 
 
 def main():

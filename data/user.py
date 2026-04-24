@@ -23,6 +23,7 @@ class User(SqlAlchemyBase, SerializerMixin, UserMixin):
     email = C(Str, index=True, unique=True, nullable=True)
     hashed_password = C(Str, nullable=True)
     modified_date = C(sqlalchemy.DateTime, default=datetime.datetime.now)
+    city_from = C(Str, nullable=True)
 
     def __repr__(self):
         return f"<Colonist> {self.id} {self.surname} {self.name}"

@@ -1,18 +1,26 @@
 from flask import Flask, render_template, request, redirect
 from flask_login import LoginManager, login_user, logout_user, login_required, current_user
 from werkzeug.security import generate_password_hash, check_password_hash
-import random
-import json
-import os
+import random, json, os
 from data.db_session import global_init, create_session
 from data.job import Jobs
 from data.user import User
 from data.departments import Department
 from data.category import Category
+from map_helper import get_map_url
+from users_api import blueprint as users_api_blueprint
+from flask_restful import Api
+from users_resource import UsersResource, UsersListResource
 
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'mars-one-secret-key'
+app.register_blueprint(users_api_blueprint)
+
+api = Api(app)
+api.add_resource(UsersListResource, '/api/v2/users')
+api.add_resource(UsersResource, '/api/v2/users/<int:user_id>')
+
 
 login_manager = LoginManager()
 login_manager.init_app(app)
@@ -365,6 +373,16 @@ def delete_category(cat_id):
         s.delete(cat)
         s.commit()
     return redirect('/categories')
+
+
+@app.route('/users_show/<int:user_id>')
+def users_show(user_id):
+    with create_session() as s:
+        user = s.get(User, user_id)
+        if not user:
+            return redirect('/')
+        map_url = get_map_url(user.city_from) if user.city_from else None
+    return render_template('users_show.html', title='Hometown', user=user, map_url=map_url)
 
 
 def main():
